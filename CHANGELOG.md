@@ -1,6 +1,19 @@
+## 0.0.5
+
+- Added `ActivityCounter` - A utility class for tracking user activity over time across various spans such as hour, day, month, and year. It provides persistent storage and retrieval of activity data, making it suitable for usage statistics, trend analysis, and generating long-term activity reports.
+- Added `.historyTracker` extension for building a persisted history tracker from any adapter
+
+```dart
+    final history = adapter.historyTracker(
+     'my_history',
+     maxLength: 100,
+     deduplicate: true,
+   );
+```
+
 ## 0.0.4
 
-- Added `HistoryTracker` - A utility class for tracking user activity over time across various spans such as hour, day, month, and year. It provides persistent storage and retrieval of activity data, making it suitable for usage statistics, trend analysis, and generating long-term activity reports.
+- Added `HistoryTracker` - A persisted, FIFO history tracker
 
 ## 0.0.3
 
