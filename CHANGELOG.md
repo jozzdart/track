@@ -1,3 +1,7 @@
+## 0.0.7
+
+- Added `RolloverCounter` - a persistent counter designed to automatically reset after a specified duration from the last update. This is particularly useful for tracking rolling activity windows, such as "submissions per hour" or "attempts every 10 minutes".
+
 ## 0.0.6
 
 - Added `PeriodicCounter` - A persistent counter that automatically resets at the start of each aligned time period designed to track integer counters that reset periodically based on a specified `TrackerPeriod`.
