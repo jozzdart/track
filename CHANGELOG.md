@@ -1,3 +1,7 @@
+## 0.0.3
+
+- Added tests for all core components to ensure reliability and correctness.
+
 ## 0.0.2
 
 - Imported `BaseCounterTracker` - An abstract class for tracking integer counters with expiration logic. It extends the `BaseTracker` to specifically handle integer counters. It provides methods to increment the counter, check if the counter is non-zero, and reset the counter value while maintaining the last update timestamp.
