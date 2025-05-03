@@ -1,3 +1,7 @@
+## 0.0.6
+
+- Added `PeriodicCounter` - A persistent counter that automatically resets at the start of each aligned time period designed to track integer counters that reset periodically based on a specified `TrackerPeriod`.
+
 ## 0.0.5
 
 - Added `ActivityCounter` - A utility class for tracking user activity over time across various spans such as hour, day, month, and year. It provides persistent storage and retrieval of activity data, making it suitable for usage statistics, trend analysis, and generating long-term activity reports.

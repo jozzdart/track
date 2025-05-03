@@ -6,3 +6,4 @@ export 'core/tracker_period.dart';
 export 'extensions/adapter_list_extensions.dart';
 export 'services/history_tracker.dart';
 export 'services/activity_counter.dart';
+export 'services/periodic_counter.dart';
