@@ -1,4 +1,4 @@
-import 'package:prf/core/extensions.dart';
+import 'package:prf/prf.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:track/track.dart';
 
@@ -6,7 +6,7 @@ import 'package:track/track.dart';
 /// after a specified duration from the last update. This is particularly useful
 /// for tracking rolling activity windows, such as "submissions per hour" or
 /// "attempts every 10 minutes".
-class RolloverCounter extends BaseCounterTracker {
+class RolloverCounter extends BaseCounterService {
   /// The duration after which the counter will automatically reset.
   final Duration resetEvery;
   final _lock = Lock();

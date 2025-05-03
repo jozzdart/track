@@ -1,6 +1,6 @@
 name: track
 description: "Easily track streaks, counters, history, and records. Effortless persistent trackers with no manual timers or storage, just define and go."
-version: 0.0.7
+version: 1.0.0
 homepage: https://github.com/jozzzzep/track
 repository: https://github.com/jozzzzep/track
 issue_tracker: https://github.com/jozzzzep/track/issues

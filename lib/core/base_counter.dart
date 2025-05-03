@@ -4,21 +4,21 @@ import 'package:track/track.dart';
 
 /// An abstract class for tracking integer counters with expiration logic.
 ///
-/// The `BaseCounterTracker` class extends the `BaseTracker` to specifically
+/// The `BaseCounterService` class extends the `BaseTrackerService` to specifically
 /// handle integer counters. It provides methods to increment the counter,
 /// check if the counter is non-zero, and reset the counter value while
 /// maintaining the last update timestamp.
 ///
 /// This class is designed to be thread-safe and uses a lock to ensure
 /// synchronized access to the counter value.
-abstract class BaseCounterTracker extends BaseTracker<int> {
-  /// Constructs a [BaseCounterTracker] with the specified [key] and [suffix].
+abstract class BaseCounterService extends BaseTrackerService<int> {
+  /// Constructs a [BaseCounterService] with the specified [key] and [suffix].
   ///
   /// The [useCache] parameter determines whether to use in-memory caching.
   /// - [key]: A unique identifier for the tracker.
   /// - [suffix]: A suffix to differentiate between different trackers.
   /// - [useCache]: A boolean flag indicating whether to use in-memory caching.
-  BaseCounterTracker(super.key, {required super.suffix, super.useCache});
+  BaseCounterService(super.key, {required super.suffix, super.useCache});
 
   /// A lock to ensure thread-safe operations on the counter.
   final _lock = Lock();

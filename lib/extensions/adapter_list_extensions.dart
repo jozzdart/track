@@ -3,7 +3,7 @@ import 'package:track/services/history_tracker.dart';
 
 /// Extensions for building a persisted history tracker from any `PrfAdapter<List<T>>`.
 extension PrfListAdapterExtensions<T> on PrfAdapter<List<T>> {
-  /// Creates a `PrfHistory<T>` instance using this adapter.
+  /// Creates a `HistoryTracker<T>` instance using this adapter.
   ///
   /// This is useful when you have a custom adapter for `List<T>` and want to
   /// track a FIFO-style history with persistence, deduplication, and max-length limits.

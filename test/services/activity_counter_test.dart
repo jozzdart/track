@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:prf/core/prf_service.dart';
+import 'package:prf/prf.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:track/track.dart';
@@ -26,7 +26,7 @@ void main() {
     test('starts at 0 for all spans', () async {
       final tracker =
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
-      for (final span in ActivitySpan.values) {
+      for (final span in TimeSpan.values) {
         expect(await tracker.amountThis(span), 0);
       }
     });
@@ -35,7 +35,7 @@ void main() {
       final tracker =
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.increment();
-      for (final span in ActivitySpan.values) {
+      for (final span in TimeSpan.values) {
         expect(await tracker.amountThis(span), 1);
       }
     });
@@ -44,7 +44,7 @@ void main() {
       final tracker =
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(5);
-      for (final span in ActivitySpan.values) {
+      for (final span in TimeSpan.values) {
         expect(await tracker.amountThis(span), 5);
       }
     });
@@ -54,7 +54,7 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(3);
       final summary = await tracker.summary();
-      for (final span in ActivitySpan.values) {
+      for (final span in TimeSpan.values) {
         expect(summary[span], 3);
       }
     });
@@ -63,27 +63,23 @@ void main() {
       final tracker =
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(2);
-      expect(await tracker.amountFor(ActivitySpan.year, DateTime(2024)), 2);
-      expect(await tracker.amountFor(ActivitySpan.month, DateTime(2024, 5)), 2);
+      expect(await tracker.amountFor(TimeSpan.year, DateTime(2024)), 2);
+      expect(await tracker.amountFor(TimeSpan.month, DateTime(2024, 5)), 2);
+      expect(await tracker.amountFor(TimeSpan.day, DateTime(2024, 5, 12)), 2);
       expect(
-          await tracker.amountFor(ActivitySpan.day, DateTime(2024, 5, 12)), 2);
-      expect(
-          await tracker.amountFor(ActivitySpan.hour, DateTime(2024, 5, 12, 15)),
-          2);
+          await tracker.amountFor(TimeSpan.hour, DateTime(2024, 5, 12, 15)), 2);
     });
 
     test('clearAllKnown removes specific data', () async {
       final tracker =
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(1);
-      await tracker.clearAllKnown([ActivitySpan.year, ActivitySpan.month]);
-      expect(await tracker.amountFor(ActivitySpan.year, DateTime(2024)), 0);
-      expect(await tracker.amountFor(ActivitySpan.month, DateTime(2024, 5)), 0);
+      await tracker.clearAllKnown([TimeSpan.year, TimeSpan.month]);
+      expect(await tracker.amountFor(TimeSpan.year, DateTime(2024)), 0);
+      expect(await tracker.amountFor(TimeSpan.month, DateTime(2024, 5)), 0);
+      expect(await tracker.amountFor(TimeSpan.day, DateTime(2024, 5, 12)), 1);
       expect(
-          await tracker.amountFor(ActivitySpan.day, DateTime(2024, 5, 12)), 1);
-      expect(
-          await tracker.amountFor(ActivitySpan.hour, DateTime(2024, 5, 12, 15)),
-          1);
+          await tracker.amountFor(TimeSpan.hour, DateTime(2024, 5, 12, 15)), 1);
     });
 
     test('adding negative amount decreases values correctly', () async {
@@ -91,7 +87,7 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(5);
       await tracker.add(-3);
-      for (final span in ActivitySpan.values) {
+      for (final span in TimeSpan.values) {
         expect(await tracker.amountThis(span), 2);
       }
     });
@@ -101,7 +97,7 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await Future.wait(
           [tracker.increment(), tracker.increment(), tracker.increment()]);
-      for (final span in ActivitySpan.values) {
+      for (final span in TimeSpan.values) {
         expect(await tracker.amountThis(span), 3);
       }
     });
@@ -110,23 +106,21 @@ void main() {
       final tracker =
           ActivityCounter(testKey, clock: () => DateTime(2024, 12, 31, 23, 59));
       await tracker.add(2);
-      expect(await tracker.amountFor(ActivitySpan.year, DateTime(2024)), 2);
-      expect(
-          await tracker.amountFor(ActivitySpan.day, DateTime(2024, 12, 31)), 2);
+      expect(await tracker.amountFor(TimeSpan.year, DateTime(2024)), 2);
+      expect(await tracker.amountFor(TimeSpan.day, DateTime(2024, 12, 31)), 2);
 
       final tracker2 =
           ActivityCounter(testKey, clock: () => DateTime(2025, 1, 1, 0));
       await tracker2.add(1);
-      expect(await tracker2.amountFor(ActivitySpan.year, DateTime(2025)), 1);
+      expect(await tracker2.amountFor(TimeSpan.year, DateTime(2025)), 1);
     });
 
     test('handles leap year correctly', () async {
       final tracker =
           ActivityCounter(testKey, clock: () => DateTime(2024, 2, 29));
       await tracker.add(10);
-      expect(await tracker.amountFor(ActivitySpan.year, DateTime(2024)), 10);
-      expect(
-          await tracker.amountFor(ActivitySpan.day, DateTime(2024, 2, 29)), 10);
+      expect(await tracker.amountFor(TimeSpan.year, DateTime(2024)), 10);
+      expect(await tracker.amountFor(TimeSpan.day, DateTime(2024, 2, 29)), 10);
     });
 
     test('reset works correctly', () async {
@@ -134,7 +128,7 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(5);
       await tracker.reset();
-      for (final span in ActivitySpan.values) {
+      for (final span in TimeSpan.values) {
         expect(await tracker.amountThis(span), 0);
       }
     });
@@ -143,12 +137,12 @@ void main() {
       final tracker =
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(1000000);
-      expect(await tracker.amountThis(ActivitySpan.year), 1000000);
+      expect(await tracker.amountThis(TimeSpan.year), 1000000);
     });
 
     test('returns 0 for uninitialized values', () async {
       final tracker = ActivityCounter(testKey);
-      expect(await tracker.amountThis(ActivitySpan.year), 0);
+      expect(await tracker.amountThis(TimeSpan.year), 0);
     });
 
     test('multiple adds are aggregated correctly', () async {
@@ -156,19 +150,18 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(3);
       await tracker.add(7);
-      expect(await tracker.amountThis(ActivitySpan.year), 10);
+      expect(await tracker.amountThis(TimeSpan.year), 10);
     });
 
     test('returns 0 for out-of-range indices', () async {
       final tracker = ActivityCounter(testKey);
 
-      expect(await tracker.amountFor(ActivitySpan.year, DateTime(1999)), 0);
-      expect(await tracker.amountFor(ActivitySpan.month, DateTime(2024, 0)),
+      expect(await tracker.amountFor(TimeSpan.year, DateTime(1999)), 0);
+      expect(await tracker.amountFor(TimeSpan.month, DateTime(2024, 0)),
           0); // invalid month
-      expect(await tracker.amountFor(ActivitySpan.day, DateTime(2024, 1, 0)),
+      expect(await tracker.amountFor(TimeSpan.day, DateTime(2024, 1, 0)),
           0); // invalid day
-      expect(
-          await tracker.amountFor(ActivitySpan.hour, DateTime(2024, 1, 1, 25)),
+      expect(await tracker.amountFor(TimeSpan.hour, DateTime(2024, 1, 1, 25)),
           0); // invalid hour
     });
 
@@ -177,7 +170,7 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(42);
       await tracker.removeAll();
-      for (final span in ActivitySpan.values) {
+      for (final span in TimeSpan.values) {
         expect(await tracker.amountThis(span), 0);
       }
     });
@@ -186,7 +179,7 @@ void main() {
       final now = DateTime(2024, 5, 12, 15);
       final tracker = ActivityCounter(testKey, clock: () => now);
       await tracker.add(17);
-      for (final span in ActivitySpan.values) {
+      for (final span in TimeSpan.values) {
         expect(
             await tracker.amountThis(span), await tracker.amountFor(span, now));
       }
@@ -201,8 +194,8 @@ void main() {
       await trackerA.add(3);
       await trackerB.add(5);
 
-      expect(await trackerA.amountThis(ActivitySpan.year), 3);
-      expect(await trackerB.amountThis(ActivitySpan.year), 5);
+      expect(await trackerA.amountThis(TimeSpan.year), 3);
+      expect(await trackerB.amountThis(TimeSpan.year), 5);
     });
 
     test('isolated access is consistent with cached', () async {
@@ -212,7 +205,7 @@ void main() {
           ActivityCounter(testKey, clock: () => now, useCache: false);
 
       await cached.add(4);
-      expect(await isolated.amountThis(ActivitySpan.hour), 4);
+      expect(await isolated.amountThis(TimeSpan.hour), 4);
     });
 
     test('values for two different days are stored separately', () async {
@@ -222,8 +215,8 @@ void main() {
       await day1.add(10);
       await day2.add(20);
 
-      expect(await day1.amountFor(ActivitySpan.day, DateTime(2024, 5, 10)), 10);
-      expect(await day2.amountFor(ActivitySpan.day, DateTime(2024, 5, 11)), 20);
+      expect(await day1.amountFor(TimeSpan.day, DateTime(2024, 5, 10)), 10);
+      expect(await day2.amountFor(TimeSpan.day, DateTime(2024, 5, 11)), 20);
     });
 
     test('values for two different days are stored separately', () async {
@@ -233,17 +226,17 @@ void main() {
       await day1.add(10);
       await day2.add(20);
 
-      expect(await day1.amountFor(ActivitySpan.day, DateTime(2024, 5, 10)), 10);
-      expect(await day2.amountFor(ActivitySpan.day, DateTime(2024, 5, 11)), 20);
+      expect(await day1.amountFor(TimeSpan.day, DateTime(2024, 5, 10)), 10);
+      expect(await day2.amountFor(TimeSpan.day, DateTime(2024, 5, 11)), 20);
     });
 
     test('does not mutate original list when setting new values', () async {
       final tracker =
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 12, 15));
       await tracker.add(1);
-      final before = await tracker.amountThis(ActivitySpan.hour);
+      final before = await tracker.amountThis(TimeSpan.hour);
       await tracker.add(2);
-      final after = await tracker.amountThis(ActivitySpan.hour);
+      final after = await tracker.amountThis(TimeSpan.hour);
 
       expect(before, 1);
       expect(after, 3);
@@ -263,22 +256,20 @@ void main() {
       await tracker3.add(30);
 
       // Check day separation
-      expect(await tracker1.amountFor(ActivitySpan.day, DateTime(2024, 12, 30)),
-          10);
-      expect(await tracker2.amountFor(ActivitySpan.day, DateTime(2024, 12, 31)),
-          20);
       expect(
-          await tracker3.amountFor(ActivitySpan.day, DateTime(2025, 1, 1)), 30);
+          await tracker1.amountFor(TimeSpan.day, DateTime(2024, 12, 30)), 10);
+      expect(
+          await tracker2.amountFor(TimeSpan.day, DateTime(2024, 12, 31)), 20);
+      expect(await tracker3.amountFor(TimeSpan.day, DateTime(2025, 1, 1)), 30);
 
       // Check month aggregation
-      expect(await tracker1.amountFor(ActivitySpan.month, DateTime(2024, 12)),
+      expect(await tracker1.amountFor(TimeSpan.month, DateTime(2024, 12)),
           30); // 10 + 20
-      expect(
-          await tracker3.amountFor(ActivitySpan.month, DateTime(2025, 1)), 30);
+      expect(await tracker3.amountFor(TimeSpan.month, DateTime(2025, 1)), 30);
 
       // Check year aggregation
-      expect(await tracker3.amountFor(ActivitySpan.year, DateTime(2024)), 30);
-      expect(await tracker3.amountFor(ActivitySpan.year, DateTime(2025)), 30);
+      expect(await tracker3.amountFor(TimeSpan.year, DateTime(2024)), 30);
+      expect(await tracker3.amountFor(TimeSpan.year, DateTime(2025)), 30);
     });
 
     test('reset clears values but allows fresh tracking', () async {
@@ -286,9 +277,9 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 6, 1));
       await tracker.add(50);
       await tracker.reset();
-      expect(await tracker.amountThis(ActivitySpan.year), 0);
+      expect(await tracker.amountThis(TimeSpan.year), 0);
       await tracker.add(7);
-      expect(await tracker.amountThis(ActivitySpan.year), 7);
+      expect(await tracker.amountThis(TimeSpan.year), 7);
     });
 
     test('time travel accumulation over months', () async {
@@ -301,9 +292,9 @@ void main() {
       final july = ActivityCounter(testKey, clock: () => DateTime(2024, 7, 15));
       await july.add(20);
 
-      expect(await july.amountFor(ActivitySpan.month, DateTime(2024, 5)), 5);
-      expect(await july.amountFor(ActivitySpan.month, DateTime(2024, 6)), 10);
-      expect(await july.amountFor(ActivitySpan.month, DateTime(2024, 7)), 20);
+      expect(await july.amountFor(TimeSpan.month, DateTime(2024, 5)), 5);
+      expect(await july.amountFor(TimeSpan.month, DateTime(2024, 6)), 10);
+      expect(await july.amountFor(TimeSpan.month, DateTime(2024, 7)), 20);
     });
 
     test('total returns sum of all entries in span', () async {
@@ -315,7 +306,7 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 13));
       await other.add(15);
 
-      expect(await tracker.total(ActivitySpan.day), 20);
+      expect(await tracker.total(TimeSpan.day), 20);
     });
 
     test('all returns correct index-value pairs', () async {
@@ -327,7 +318,7 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 5, 11));
       await tracker2.add(7);
 
-      final map = await tracker2.all(ActivitySpan.day);
+      final map = await tracker2.all(TimeSpan.day);
       expect(map[10], 3);
       expect(map[11], 7);
       expect(map.length, 2);
@@ -342,7 +333,7 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 6, 6));
       await tracker2.add(2);
 
-      final active = await tracker.activeDates(ActivitySpan.day);
+      final active = await tracker.activeDates(TimeSpan.day);
       expect(active.contains(DateTime(2024, 6, 5)), isTrue);
       expect(active.contains(DateTime(2024, 6, 6)), isTrue);
       expect(active.length, 2);
@@ -359,8 +350,8 @@ void main() {
           ActivityCounter(testKey, clock: () => DateTime(2024, 6, 12));
       await tracker3.add(6);
 
-      expect(await tracker.maxValue(ActivitySpan.day), 9);
-      expect(await tracker.maxValue(ActivitySpan.month), 19);
+      expect(await tracker.maxValue(TimeSpan.day), 9);
+      expect(await tracker.maxValue(TimeSpan.month), 19);
     });
 
     test('hasAnyData returns true only when data exists', () async {

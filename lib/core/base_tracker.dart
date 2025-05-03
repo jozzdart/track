@@ -1,20 +1,20 @@
-import 'package:prf/prf.dart' as prf_package;
+import 'package:prf/prf.dart';
 import 'package:synchronized/synchronized.dart';
 
 /// An abstract base class for tracking values with expiration logic.
 ///
-/// The `BaseTracker` class provides a framework for tracking values that
+/// The `BaseTrackerService` class provides a framework for tracking values that
 /// can expire over time. It manages the storage and retrieval of these
 /// values using a caching mechanism and ensures that the values are
 /// refreshed when they expire.
 ///
 /// Type parameter [T] represents the type of the value being tracked.
-abstract class BaseTracker<T> extends prf_package.BaseServiceObject {
+abstract class BaseTrackerService<T> extends BaseServiceObject {
   /// The cached value with optional in-memory caching.
-  final prf_package.Prf<T> _valueWithCache;
+  final Prf<T> _valueWithCache;
 
   /// The cached last update timestamp with optional in-memory caching.
-  final prf_package.Prf<DateTime> _lastUpdateWithCache;
+  final Prf<DateTime> _lastUpdateWithCache;
 
   /// A lock to ensure thread-safe operations.
   final _lock = Lock();
@@ -23,23 +23,22 @@ abstract class BaseTracker<T> extends prf_package.BaseServiceObject {
   ///
   /// Returns a [BasePrfObject] that either uses in-memory caching or
   /// reads directly from disk based on the [useCache] flag.
-  prf_package.BasePrfObject<T> get value =>
+  BasePrfObject<T> get value =>
       useCache ? _valueWithCache : _valueWithCache.isolated;
 
   /// Provides access to the last update timestamp, considering the caching strategy.
   ///
   /// Returns a [BasePrfObject] that either uses in-memory caching or
   /// reads directly from disk based on the [useCache] flag.
-  prf_package.BasePrfObject<DateTime> get lastUpdate =>
+  BasePrfObject<DateTime> get lastUpdate =>
       useCache ? _lastUpdateWithCache : _lastUpdateWithCache.isolated;
 
-  /// Constructs a [BaseTracker] with the specified [key] and [suffix].
+  /// Constructs a [BaseTrackerService] with the specified [key] and [suffix].
   ///
   /// The [useCache] parameter determines whether to use in-memory caching.
-  BaseTracker(String key, {required String suffix, super.useCache})
-      : _valueWithCache =
-            prf_package.Prf<T>('${key}_$suffix', defaultValue: null),
-        _lastUpdateWithCache = prf_package.Prf<DateTime>('${key}_last_$suffix');
+  BaseTrackerService(String key, {required String suffix, super.useCache})
+      : _valueWithCache = Prf<T>('${key}_$suffix', defaultValue: null),
+        _lastUpdateWithCache = Prf<DateTime>('${key}_last_$suffix');
 
   /// Retrieves the tracked value, resetting it if expired.
   ///

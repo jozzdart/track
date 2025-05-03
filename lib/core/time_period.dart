@@ -1,5 +1,5 @@
 /// Represents different time periods for tracking purposes.
-enum TrackerPeriod {
+enum TimePeriod {
   /// 10 seconds period.
   seconds10,
 
@@ -58,50 +58,50 @@ enum TrackerPeriod {
   monthly,
 }
 
-/// Extension on [TrackerPeriod] to provide additional functionality.
-extension TrackerPeriodExt on TrackerPeriod {
-  /// Returns the [Duration] corresponding to the [TrackerPeriod].
+/// Extension on [TimePeriod] to provide additional functionality.
+extension TimePeriodExt on TimePeriod {
+  /// Returns the [Duration] corresponding to the [TimePeriod].
   ///
   /// This method provides the exact duration for each period type.
   Duration get duration {
     switch (this) {
-      case TrackerPeriod.seconds10:
+      case TimePeriod.seconds10:
         return Duration(seconds: 10);
-      case TrackerPeriod.seconds20:
+      case TimePeriod.seconds20:
         return Duration(seconds: 20);
-      case TrackerPeriod.seconds30:
+      case TimePeriod.seconds30:
         return Duration(seconds: 30);
-      case TrackerPeriod.minutes1:
+      case TimePeriod.minutes1:
         return Duration(minutes: 1);
-      case TrackerPeriod.minutes2:
+      case TimePeriod.minutes2:
         return Duration(minutes: 2);
-      case TrackerPeriod.minutes3:
+      case TimePeriod.minutes3:
         return Duration(minutes: 3);
-      case TrackerPeriod.minutes5:
+      case TimePeriod.minutes5:
         return Duration(minutes: 5);
-      case TrackerPeriod.minutes10:
+      case TimePeriod.minutes10:
         return Duration(minutes: 10);
-      case TrackerPeriod.minutes15:
+      case TimePeriod.minutes15:
         return Duration(minutes: 15);
-      case TrackerPeriod.minutes20:
+      case TimePeriod.minutes20:
         return Duration(minutes: 20);
-      case TrackerPeriod.minutes30:
+      case TimePeriod.minutes30:
         return Duration(minutes: 30);
-      case TrackerPeriod.hourly:
+      case TimePeriod.hourly:
         return Duration(hours: 1);
-      case TrackerPeriod.every2Hours:
+      case TimePeriod.every2Hours:
         return Duration(hours: 2);
-      case TrackerPeriod.every3Hours:
+      case TimePeriod.every3Hours:
         return Duration(hours: 3);
-      case TrackerPeriod.every6Hours:
+      case TimePeriod.every6Hours:
         return Duration(hours: 6);
-      case TrackerPeriod.every12Hours:
+      case TimePeriod.every12Hours:
         return Duration(hours: 12);
-      case TrackerPeriod.daily:
+      case TimePeriod.daily:
         return Duration(days: 1);
-      case TrackerPeriod.weekly:
+      case TimePeriod.weekly:
         return Duration(days: 7);
-      case TrackerPeriod.monthly:
+      case TimePeriod.monthly:
         return Duration(days: 31); // special case
     }
   }
@@ -112,12 +112,12 @@ extension TrackerPeriodExt on TrackerPeriod {
   /// For example, if the period is daily, it returns the start of the current day.
   DateTime alignedStart(DateTime now) {
     switch (this) {
-      case TrackerPeriod.daily:
+      case TimePeriod.daily:
         return DateTime(now.year, now.month, now.day);
-      case TrackerPeriod.weekly:
+      case TimePeriod.weekly:
         final monday = now.subtract(Duration(days: now.weekday - 1));
         return DateTime(monday.year, monday.month, monday.day);
-      case TrackerPeriod.monthly:
+      case TimePeriod.monthly:
         return DateTime(now.year, now.month);
       default:
         final seconds = duration.inSeconds;

@@ -1,17 +1,17 @@
-import 'package:prf/core/extensions.dart';
+import 'package:prf/prf.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:track/track.dart';
 
 /// A persistent counter that automatically resets at the start of each aligned time period.
 ///
 /// `PeriodicCounter` is designed to track integer counters that reset periodically
-/// based on a specified [TrackerPeriod]. It ensures thread-safe operations using a lock
+/// based on a specified [TimePeriod]. It ensures thread-safe operations using a lock
 /// and provides methods to check expiration, reset the counter, and calculate time-related
 /// metrics for the current period. This is ideal for scenarios where counters need to be
 /// reset at regular intervals, such as daily or weekly counters.
-class PeriodicCounter extends BaseCounterTracker {
+class PeriodicCounter extends BaseCounterService {
   /// The period for which the counter is valid.
-  final TrackerPeriod period;
+  final TimePeriod period;
 
   /// Constructs a [PeriodicCounter] with the specified [key], [period], and optional [useCache].
   ///

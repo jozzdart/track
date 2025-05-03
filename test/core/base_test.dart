@@ -1,13 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:prf/core/extensions.dart';
-import 'package:prf/core/prf_service.dart';
+import 'package:prf/prf.dart';
 import 'package:track/track.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 import '../utils/fake_prefs.dart';
 
-class TestIntTracker extends BaseTracker<int> {
+class TestIntTracker extends BaseTrackerService<int> {
   int resetCount = 0;
 
   TestIntTracker(super.key, {super.useCache}) : super(suffix: 'test');
@@ -37,7 +36,7 @@ void main() {
     return (prefs, store);
   }
 
-  group('BaseTracker', () {
+  group('BaseTrackerService', () {
     setUp(() {
       PrfService.resetOverride();
       final (prefs, _) = getPreferences();

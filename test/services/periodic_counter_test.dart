@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:prf/core/extensions.dart';
-import 'package:prf/core/prf_service.dart';
+import 'package:prf/prf.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:shared_preferences_platform_interface/types.dart';
@@ -23,7 +23,7 @@ void main() {
       PrfService.resetOverride();
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       await counter.clear();
     });
 
@@ -31,7 +31,7 @@ void main() {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       expect(await counter.get(), 0);
     });
 
@@ -39,7 +39,7 @@ void main() {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       expect(await counter.increment(), 1);
       expect(await counter.increment(), 2);
     });
@@ -48,7 +48,7 @@ void main() {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       expect(await counter.increment(5), 5);
       expect(await counter.increment(2), 7);
     });
@@ -58,7 +58,7 @@ void main() {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       await counter.increment(); // 1
 
       final old = DateTime.now().subtract(const Duration(days: 3));
@@ -72,11 +72,11 @@ void main() {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       await counter.increment();
       await counter.reset();
 
-      final aligned = TrackerPeriod.daily.alignedStart(DateTime.now());
+      final aligned = TimePeriod.daily.alignedStart(DateTime.now());
       final last = await counter.lastUpdate.get();
 
       expect(last, isNotNull);
@@ -87,7 +87,7 @@ void main() {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       expect(await counter.hasState(), isFalse);
       await counter.increment();
       expect(await counter.hasState(), isTrue);
@@ -97,7 +97,7 @@ void main() {
       final (prefs, store) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       await counter.increment();
       expect(await counter.hasState(), isTrue);
       await counter.clear();
@@ -115,12 +115,12 @@ void main() {
       PrfService.overrideWith(prefs);
 
       {
-        final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+        final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
         await counter.increment(); // 1
       }
 
       {
-        final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+        final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
         expect(await counter.get(), 1); // persists across instances
       }
     });
@@ -129,8 +129,8 @@ void main() {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final c1 = PeriodicCounter('c1', period: TrackerPeriod.daily);
-      final c2 = PeriodicCounter('c2', period: TrackerPeriod.daily);
+      final c1 = PeriodicCounter('c1', period: TimePeriod.daily);
+      final c2 = PeriodicCounter('c2', period: TimePeriod.daily);
 
       await c1.increment();
       await c1.increment();
@@ -140,15 +140,15 @@ void main() {
       expect(await c2.get(), 1);
     });
 
-    test('aligned period math works across TrackerPeriod options', () async {
+    test('aligned period math works across TimePeriod options', () async {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
       final periods = [
-        TrackerPeriod.minutes5,
-        TrackerPeriod.minutes10,
-        TrackerPeriod.hourly,
-        TrackerPeriod.daily,
+        TimePeriod.minutes5,
+        TimePeriod.minutes10,
+        TimePeriod.hourly,
+        TimePeriod.daily,
       ];
 
       for (final period in periods) {
@@ -165,7 +165,7 @@ void main() {
     test('fallback logic returns 0 if nothing stored', () async {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
-      final counter = PeriodicCounter('no_state', period: TrackerPeriod.daily);
+      final counter = PeriodicCounter('no_state', period: TimePeriod.daily);
       expect(await counter.get(), 0);
     });
 
@@ -174,10 +174,10 @@ void main() {
       PrfService.overrideWith(prefs);
 
       final now = DateTime.now();
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
 
-      final aligned = TrackerPeriod.daily.alignedStart(now);
-      final nextAligned = aligned.add(TrackerPeriod.daily.duration);
+      final aligned = TimePeriod.daily.alignedStart(now);
+      final nextAligned = aligned.add(TimePeriod.daily.duration);
 
       expect(counter.currentPeriodStart.difference(aligned).inSeconds.abs(),
           lessThan(2));
@@ -189,29 +189,29 @@ void main() {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       final remaining = counter.timeUntilNextPeriod;
 
       expect(remaining, greaterThan(Duration.zero));
-      expect(remaining, lessThanOrEqualTo(TrackerPeriod.daily.duration));
+      expect(remaining, lessThanOrEqualTo(TimePeriod.daily.duration));
     });
 
     test('elapsedInCurrentPeriod is less than full duration', () async {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       final elapsed = counter.elapsedInCurrentPeriod;
 
       expect(elapsed, greaterThanOrEqualTo(Duration.zero));
-      expect(elapsed, lessThanOrEqualTo(TrackerPeriod.daily.duration));
+      expect(elapsed, lessThanOrEqualTo(TimePeriod.daily.duration));
     });
 
     test('percentElapsed is within 0.0 to 1.0', () async {
       final (prefs, _) = getPreferences();
       PrfService.overrideWith(prefs);
 
-      final counter = PeriodicCounter(testKey, period: TrackerPeriod.daily);
+      final counter = PeriodicCounter(testKey, period: TimePeriod.daily);
       final percent = counter.percentElapsed;
 
       expect(percent, inInclusiveRange(0.0, 1.0));

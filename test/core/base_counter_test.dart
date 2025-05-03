@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:prf/core/extensions.dart';
-import 'package:prf/core/prf_service.dart';
+import 'package:prf/prf.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:track/track.dart';
 
 import '../utils/fake_prefs.dart';
 
-class TestCounterTracker extends BaseCounterTracker {
+class TestCounterTracker extends BaseCounterService {
   final Duration duration;
 
   TestCounterTracker(super.key, {this.duration = const Duration(seconds: 1)})
