@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Added `HistoryTracker` - A utility class for tracking user activity over time across various spans such as hour, day, month, and year. It provides persistent storage and retrieval of activity data, making it suitable for usage statistics, trend analysis, and generating long-term activity reports.
+
 ## 0.0.3
 
 - Added tests for all core components to ensure reliability and correctness.
