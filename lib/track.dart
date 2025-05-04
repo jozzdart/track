@@ -38,3 +38,4 @@ export 'services/history_tracker.dart';
 export 'services/periodic_counter.dart';
 export 'services/rollover_counter.dart';
 export 'services/streak_tracker.dart';
+export 'services/best_record.dart';
