@@ -20,11 +20,12 @@ Define once, track forever.
 #### Table of Contents
 
 - [🔥 **StreakTracker**](#-streaktracker-persistent-streak-tracker) — track streaks that reset when a period is missed (e.g. daily habits)
-- [🧾 **HistoryTracker**](#-historytrackert--persistent-history-tracker) — maintain a rolling list of recent items with max length and deduplication
+- [🧾 **HistoryTracker**](#-historytracker-persistent-history-tracker) — maintain a rolling list of recent items with max length and deduplication
 - [📈 **PeriodicCounter**](#-periodiccounter-aligned-timed-counter) — count events within aligned time periods (e.g. daily tasks, hourly goals)
 - [⏳ **RolloverCounter**](#-rollovercounter-sliding-window-counter) — track counts over a sliding window that resets after inactivity
-- [📆 **ActivityCounter**](#-activitycounter--persistent-activity-tracker) — capture detailed activity stats over hours, days, months, and years
-  > 🏅 **BestRecord** - in progress
+- [📆 **ActivityCounter**](#-activitycounter-persistent-activity-tracker) — capture detailed activity stats over hours, days, months, and years
+- [🏅 **BestRecord**](#-bestrecord--track-best-values-over-time) — track the best (max or min) performance over time, with history and fallback
+- [🔢 **BasicCounter**](#-basiccounter--simple-persistent-counter) — simple persistent counter with no expiration or alignment
 
 ---
 
@@ -59,13 +60,16 @@ Each service is tailored for a specific pattern of time-based control.
 | "Count per hour / day / week"      | [`PeriodicCounter`](#-periodiccounter-aligned-timed-counter)         |
 | "Reset X minutes after last use"   | [`RolloverCounter`](#-rollovercounter-sliding-window-counter)        |
 | "Track activity history over time" | [`ActivityCounter`](#-activitycounter--persistent-activity-tracker)  |
+| "Track the best result or score"   | [`BestRecord`](#-bestrecord--track-best-values-over-time)            |
+| "Simple always-on counter"         | [`BasicCounter`](#-basiccounter--simple-persistent-counter)          |
 
 [**🔥 `StreakTracker`**](#-streaktracker-persistent-streak-tracker)
 
 > _"Maintain a daily learning streak"_  
 > → Aligned periods (`daily`, `weekly`, etc.)  
 > → Resets if user misses a full period  
-> → Ideal for habit chains, gamified streaks
+> → Ideal for habit chains, gamified streaks  
+> → Tracks best streak ever (with BestRecord)
 
 [**🧾 `HistoryTracker<T>`**](#-historytrackert--persistent-history-tracker)
 
@@ -93,6 +97,18 @@ Each service is tailored for a specific pattern of time-based control.
 > → Supports summaries, totals, active dates, and trimming  
 > → Ideal for activity heatmaps, usage analytics, or historical stats
 
+[**🏅 `BestRecord`**](#-bestrecord--track-best-values-over-time)
+
+> _"Record your highest score or fastest time"_  
+> → Tracks best (max/min) values with full history and fallback  
+> → Great for highscores, fastest runs, or top performance
+
+[**🔢 `BasicCounter`**](#-basiccounter--simple-persistent-counter)
+
+> _"Count total taps, visits, or actions"_  
+> → Simple always-on counter without reset logic  
+> → Now with synchronized `clearValueOnly()` for safe updates
+
 ---
 
 # 🔥 `StreakTracker` Persistent Streak Tracker
@@ -106,6 +122,9 @@ It handles:
 - Aligned period tracking (`daily`, `weekly`, etc.) via `TimePeriod`
 - Persistent storage with `prf` using `PrfIso<int>` and `DateTime`
 - Automatic streak expiration logic if a period is skipped
+- [**Best streak record tracking** with integrated `BestRecord`](#-bestrecord--track-best-values-over-time)
+  - Tracks the highest (or lowest) streak ever achieved
+  - Maintains optional record history and fallback record
 - Useful metadata like last update time, next reset estimate, and time remaining
 
 ---
@@ -134,6 +153,12 @@ You can also access **period-related properties**:
 - `timeUntilNextPeriod` — Returns a `Duration` until the next reset occurs
 - `elapsedInCurrentPeriod` — How much time has passed since the period began
 - `percentElapsed` — A progress indicator (0.0 to 1.0) showing how far into the period we are
+
+**Best Streak Records:**
+
+The `StreakTracker` includes a built-in `records` property, powered by [the `BestRecord` service](#-bestrecord--track-best-values-over-time).
+
+It automatically tracks the highest (or lowest) streak ever achieved, with optional record history, fallback values, and flexible record modes — all accessible through the `records` API.
 
 ---
 
@@ -1086,6 +1111,356 @@ Each utility accepts a `useCache` flag:
 final counter = ActivityCounter(
     'user_events',
     useCache: true // false by default
+);
+```
+
+- `useCache: false` (default):
+
+  - Fully **isolate-safe**
+  - Reads directly from storage every time
+  - Best when multiple isolates might read/write the same data
+
+- `useCache: true`:
+  - Uses **memory caching** for faster access
+  - **Not isolate-safe** — may lead to stale or out-of-sync data across isolates
+  - Best when used in single-isolate environments (most apps)
+
+> ⚠️ **Warning**: Enabling `useCache` disables isolate safety. Use only when you're sure no other isolate accesses the same key.
+
+# 🏅 `BestRecord` – Track Best Values Over Time
+
+[⤴️ Back](#table-of-contents) → Table of Contents
+
+`BestRecord` makes it simple to **track and store the best (or worst) values** your app has ever seen — like high scores, fastest times, longest streaks, or minimum records. It automatically compares new values, updates the record if appropriate, and keeps a persistent, timestamped history of all bests.
+
+It automatically:
+
+- Tracks the highest or lowest value, based on `RecordMode` (`max` or `min`)
+- Stores a history of record-breaking entries
+- Provides fallback records if no data exists
+- Works safely across isolates with optional caching
+
+---
+
+### 🧰 Core Features
+
+- `update(value)` — Adds a new record **only if it beats the current best**
+- `getBestRecord()` — Returns the best value saved so far
+- `getBestEntry()` — Returns the best record as `RecordEntry` (with value + date)
+- `getBestOrFallback()` — Returns the best record or fallback if none exist
+- `getBestDate()` — Returns the date when the best record was set
+- `getHistory()` — Returns the full record history (most recent first)
+- `reset()` — Clears all saved records
+- `removeKey()` — Deletes the record key from persistent storage
+- `manualSet(value)` — Force-adds a record **without comparison**
+- `removeAt(index)` — Removes a record at a specific index in history
+- `removeWhere(predicate)` — Removes all records matching a condition
+- `first()` — Returns the most recent record in history, or `null`
+- `last()` — Returns the oldest record in history, or `null`
+- `exists()` — Checks if any records are saved
+
+* _Fields_:
+
+  - `mode` — Whether to track the **maximum** or **minimum** value
+  - `historyLength` — Maximum number of records to keep
+  - `fallback` — Default record if no entries exist
+  - `key` — Unique key used for persistence
+  - `useCache` — Enables fast, non-isolate-safe mode
+
+---
+
+#### ✅ Define a BestRecord Service
+
+```dart
+final record = BestRecord('highscore', mode: historyLength: 5);
+```
+
+This creates a persistent best-record tracker that saves the **highest value ever achieved**.
+It uses the key `'best_record_highscore'` to store:
+
+- Best value and its timestamp
+- A rolling history of the top 5 records
+
+---
+
+#### ➕ Update the Record
+
+```dart
+await record.update(150);     // Only saves if 150 > current best
+await record.update(200);     // Updates best to 200 if higher
+```
+
+New values are only saved if they beat the current best (or are lower, in `min` mode).
+
+---
+
+#### 🏆 Get the Best Value
+
+```dart
+final best = await record.getBestRecord(); // e.g., 200
+final entry = await record.getBestEntry(); // RecordEntry(value, date)
+```
+
+You can also fetch a fallback:
+
+```dart
+final bestOrFallback = await record.getBestOrFallback();
+```
+
+---
+
+#### 📜 View Record History
+
+```dart
+final history = await record.getHistory(); // List<RecordEntry>
+```
+
+Example use: display top 5 scores or fastest runs.
+
+---
+
+#### 🔄 Reset or Clear Records
+
+```dart
+await record.reset();      // Clears all saved records
+await record.removeKey();  // Removes the key from storage entirely
+```
+
+---
+
+#### ⚙️ Manually Add or Remove Records
+
+```dart
+await record.manualSet(300);    // Force-add 300, bypassing checks
+await record.removeAt(0);       // Remove the most recent record
+await record.removeWhere((e) => e.value < 100); // Remove low scores
+```
+
+---
+
+#### 📅 Inspect Record Details
+
+```dart
+final date = await record.getBestDate(); // When the best was set
+final first = await record.first();      // Most recent record
+final last = await record.last();        // Oldest record
+```
+
+---
+
+#### 🧪 Check and Manage State
+
+```dart
+final exists = await record.exists();    // true if any records saved
+```
+
+#### ⚡ Optional `useCache` Parameter
+
+Each utility accepts a `useCache` flag:
+
+```dart
+final record = BestRecord(
+  'highscore',
+  useCache: true // false by default
+);
+```
+
+- `useCache: false` (default):
+
+  - Fully **isolate-safe**
+  - Reads directly from storage every time
+  - Best when multiple isolates might read/write the same data
+
+- `useCache: true`:
+  - Uses **memory caching** for faster access
+  - **Not isolate-safe** — may lead to stale or out-of-sync data across isolates
+  - Best when used in single-isolate environments (most apps)
+
+> ⚠️ **Warning**: Enabling `useCache` disables isolate safety. Use only when you're sure no other isolate accesses the same key.
+
+# 🔢 `BasicCounter` – Simple Persistent Counter
+
+[⤴️ Back](#table-of-contents) → Table of Contents
+
+`BasicCounter` gives you a **simple, persistent counter** with no expiration or time-based reset — perfect for tracking things like total app launches, button taps, or items added. It automatically persists across sessions and works safely with or without isolate-safe caching.
+
+It automatically:
+
+- Stores an integer counter with an optional last update timestamp
+- Provides reset, clear, and direct access methods
+- Supports thread-safe (`synchronized`) operations
+- Works with or without in-memory (`useCache`) mode
+
+---
+
+### 🧰 Core Features
+
+- `increment([amount])` → Increases the counter by `amount` (default: `1`)
+- `get()` → Returns the current value (auto-checks expiration — always valid in `BasicCounter`)
+- `peek()` → Returns the current value **without** checking expiration
+- `raw()` → Returns the stored value, even if stale
+- `reset()` → Resets counter to fallback value (`0`) and updates last update time
+- `clearValueOnly()` → Resets value to `0` but keeps the last update timestamp
+- `clear()` → Deletes both the value and last update timestamp from storage
+- `hasState()` → Checks if **any** saved data (value or timestamp) exists
+- `exists()` → Same as `hasState()`, checks if stored data exists
+- `isNonZero()` → Checks if the current counter value is greater than `0`
+- `isCurrentlyExpired()` → Checks if the counter is expired (`false` for `BasicCounter`)
+- `getLastUpdateTime()` → Returns the last time the counter was updated (or `null`)
+- `timeSinceLastUpdate()` → Returns duration since last update (or `null` if never)
+- `fallbackValue()` → Always returns `0` — the default reset value
+
+* _Fields_:
+
+  - `key` → Unique string key used for persistence
+  - `useCache` → Enables in-memory (non-isolate-safe) caching
+
+---
+
+#### ✅ Define a Basic Counter
+
+```dart
+final counter = BasicCounter('my_counter');
+```
+
+This creates a persistent counter that:
+
+- Uses the key `'my_counter_basic'`
+- Tracks a simple integer value
+- Never expires or resets automatically
+
+---
+
+#### ➕ Increment the Counter
+
+```dart
+await counter.increment();      // +1
+await counter.increment(5);     // +5
+```
+
+This increases the counter value by the given amount.
+
+---
+
+#### 📊 Get Current Counter Value
+
+```dart
+final current = await counter.get();
+```
+
+Returns the current counter value.
+
+---
+
+#### 👁 Peek at Stored Value
+
+```dart
+final peeked = await counter.peek();
+```
+
+Returns the stored value **without refreshing or checking expiration**.
+
+---
+
+#### 📦 Get Raw Stored Value
+
+```dart
+final raw = await counter.raw();
+```
+
+Returns the stored value directly, even if stale.
+
+---
+
+#### 🔄 Reset the Counter
+
+```dart
+await counter.reset();
+```
+
+Sets the counter back to `0` and updates the last update time.
+
+---
+
+#### 🧹 Clear Only the Value
+
+```dart
+await counter.clearValueOnly();
+```
+
+Resets the value to `0` but **keeps** the last update timestamp.
+
+---
+
+#### 🧪 Clear All State
+
+```dart
+await counter.clear();
+```
+
+Removes both the counter value and its timestamp from storage.
+
+---
+
+#### ❓ Check If Any Data Exists
+
+```dart
+final hasState = await counter.hasState();
+final exists = await counter.exists(); // same as hasState
+```
+
+Returns `true` if any saved value or timestamp exists.
+
+---
+
+#### 📈 Check If Counter Is Non-Zero
+
+```dart
+final isActive = await counter.isNonZero();
+```
+
+Returns `true` if the counter value is greater than zero.
+
+---
+
+#### ⏰ Check Expiration (Always False)
+
+```dart
+final expired = await counter.isCurrentlyExpired();
+```
+
+Returns `false` — `BasicCounter` never expires.
+
+---
+
+#### 📅 Get Last Update Time
+
+```dart
+final lastUpdate = await counter.getLastUpdateTime();
+```
+
+Returns the `DateTime` when the counter was last updated (or `null` if never).
+
+---
+
+#### ⌛ Time Since Last Update
+
+```dart
+final since = await counter.timeSinceLastUpdate();
+```
+
+Returns how long ago the counter was updated (or `null` if never).
+
+---
+
+#### ⚡ Optional `useCache` Parameter
+
+Each utility accepts a `useCache` flag:
+
+```dart
+final counter = BasicCounter(
+  'my_counter',
+  useCache: true // false by default
 );
 ```
 
