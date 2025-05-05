@@ -8,8 +8,8 @@
         <img src="https://img.shields.io/pub/v/track?style=flat-square">
 </p>
 <p align="center">
-  <a href="https://buymeacoffee.com/yourname" target="_blank">
-    <img src="https://img.shields.io/badge/Buy%20me%20a%20coffee-Support☕-blue?logo=buymeacoffee&style=flat-square" />
+  <a href="https://buymeacoffee.com/yosefd99v" target="https://buymeacoffee.com/yosefd99v">
+    <img src="https://img.shields.io/badge/Buy%20me%20a%20coffee-Support (:-blue?logo=buymeacoffee&style=flat-square" />
   </a>
 </p>
 
