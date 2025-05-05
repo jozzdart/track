@@ -1,3 +1,22 @@
+## 1.1.0
+
+### **New services added**:
+
+- 🏅 **BestRecord** — track the best (max or min) performance or value over time, with a full history and fallback support. Example use cases: high scores, fastest times, highest streaks
+
+- 🔢 **BasicCounter** — a simple persistent counter with no expiration or alignment. Example use cases: total taps, visits, or actions
+
+### **Enhancements**:
+
+- 🔥 **StreakTracker now integrates BestRecord**
+  - Automatically tracks and saves the highest streak ever achieved
+  - Supports history length, fallback records, and customizable record mode (`max` or `min`)
+
+### Fixed:
+
+- **Synchronized `clearValueOnly()` in BaseCounterService**  
+  Now uses `_lock.synchronized()` to prevent race conditions, ensuring thread safety like `increment()` and `reset()`.
+
 ## 1.0.0
 
 ### ✨ **`track` initial release**

@@ -7,18 +7,36 @@ import 'package:track/track.dart';
 /// `StreakTracker` is designed to track streaks over aligned time periods (e.g., daily, weekly).
 /// It automatically resets if a full period is missed and persists streak progress across sessions
 /// and isolates. This class is ideal for scenarios like daily check-ins, learning streaks, or workout chains.
+/// Additionally, it maintains a record of the best streaks achieved.
 class StreakTracker extends BaseTrackerService<int> {
   /// The period for which the streak is tracked.
   final TimePeriod period;
   final _lock = Lock();
+  final BestRecord records;
 
   /// Constructs a [StreakTracker] with the specified [key], [period], and optional [useCache].
   ///
   /// - [key]: A unique identifier for the streak tracker.
   /// - [period]: Defines the duration and alignment of the streak's validity.
   /// - [useCache]: A boolean flag indicating whether to use in-memory caching.
-  StreakTracker(super.key, {required this.period, super.useCache})
-      : super(suffix: 'streak');
+  /// - [recordsHistory]: The number of historical records to maintain.
+  /// - [recordsMode]: The mode for recording streaks, e.g., max or min.
+  /// - [customRecordFallback]: A custom fallback record entry.
+  StreakTracker(
+    super.key, {
+    required this.period,
+    int recordsHistory = 1,
+    RecordMode recordsMode = RecordMode.max,
+    RecordEntry? customRecordFallback,
+    super.useCache,
+  })  : records = BestRecord(
+          '${key}_streak_best_record',
+          mode: recordsMode,
+          historyLength: recordsHistory,
+          fallback: customRecordFallback ?? RecordEntry(0, DateTime.now()),
+          useCache: useCache,
+        ),
+        super(suffix: 'streak');
 
   /// Determines if the streak is expired based on the current time [now] and the [last] update time.
   ///
@@ -49,6 +67,7 @@ class StreakTracker extends BaseTrackerService<int> {
   /// Marks a completed period and increments the streak by [amount] (default: 1).
   ///
   /// This method ensures thread-safe operation using a lock.
+  /// It also updates the best records with the new streak value.
   Future<int> bump([int amount = 1]) => _lock.synchronized(() async {
         final now = DateTime.now();
         final alignedNow = period.alignedStart(now);
@@ -63,6 +82,9 @@ class StreakTracker extends BaseTrackerService<int> {
           value.set(updated),
           lastUpdate.set(alignedNow),
         ]);
+
+        await records.update(updated);
+
         return updated;
       });
 
