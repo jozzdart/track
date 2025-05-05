@@ -31,7 +31,7 @@ void main() {
       PrfService.overrideWith(prefs);
 
       final record = BestRecord(testKey);
-      expect(await record.getBest(), isNull);
+      expect(await record.getBestEntry(), isNull);
       expect(await record.getBestRecord(), isNull);
       expect(await record.getBestDate(), isNull);
     });
@@ -45,7 +45,7 @@ void main() {
       await record.update(10);
       await record.update(7);
 
-      final best = await record.getBest();
+      final best = await record.getBestEntry();
       expect(best!.value, 10);
     });
 
@@ -58,7 +58,7 @@ void main() {
       await record.update(2);
       await record.update(7);
 
-      final best = await record.getBest();
+      final best = await record.getBestEntry();
       expect(best!.value, 2);
     });
 
@@ -89,7 +89,7 @@ void main() {
       final record = BestRecord(testKey);
       await record.manualSet(99);
 
-      final best = await record.getBest();
+      final best = await record.getBestEntry();
       expect(best!.value, 99);
     });
 
@@ -130,7 +130,7 @@ void main() {
       await record.update(5);
       await record.reset();
 
-      expect(await record.getBest(), isNull);
+      expect(await record.getBestEntry(), isNull);
     });
 
     test('removeKey deletes preferences key', () async {
@@ -162,7 +162,7 @@ void main() {
 
       {
         final record = BestRecord(testKey);
-        final best = await record.getBest();
+        final best = await record.getBestEntry();
         expect(best!.value, 10);
       }
     });
@@ -205,7 +205,7 @@ void main() {
       await record.update(100);
       final after = DateTime.now();
 
-      final best = await record.getBest();
+      final best = await record.getBestEntry();
       expect(best!.date.isAfter(before) || best.date.isAtSameMomentAs(before),
           isTrue);
       expect(best.date.isBefore(after) || best.date.isAtSameMomentAs(after),
@@ -243,7 +243,7 @@ void main() {
       final record = BestRecord(testKey, mode: RecordMode.min);
       await record.update(5);
       await record.update(10); // should NOT overwrite best
-      final best = await record.getBest();
+      final best = await record.getBestEntry();
       expect(best!.value, 5);
     });
 
@@ -254,7 +254,7 @@ void main() {
       final record = BestRecord(testKey, mode: RecordMode.max);
       await record.update(10);
       await record.update(5); // should NOT overwrite best
-      final best = await record.getBest();
+      final best = await record.getBestEntry();
       expect(best!.value, 10);
     });
 
@@ -320,7 +320,7 @@ void main() {
         await record.update(i);
       }
 
-      final best = await record.getBest();
+      final best = await record.getBestEntry();
       final history = await record.getHistory();
 
       expect(best!.value, 99);
@@ -337,7 +337,7 @@ void main() {
 
       await Future.wait(List.generate(20, (i) => record.update(i)));
 
-      final best = await record.getBest();
+      final best = await record.getBestEntry();
       expect(best!.value, 19);
     });
 
@@ -351,7 +351,7 @@ void main() {
       await record.manualSet(8);
       await record.update(12);
 
-      final best = await record.getBest();
+      final best = await record.getBestEntry();
       expect(best!.value, 12);
     });
 
@@ -399,8 +399,8 @@ void main() {
       await recordA.update(10);
       await recordB.update(20);
 
-      final bestA = await recordA.getBest();
-      final bestB = await recordB.getBest();
+      final bestA = await recordA.getBestEntry();
+      final bestB = await recordB.getBestEntry();
 
       expect(bestA!.value, 10);
       expect(bestB!.value, 20);
@@ -417,7 +417,7 @@ void main() {
       final recordMin = BestRecord(testKey, mode: RecordMode.min);
       await recordMin.update(3);
 
-      final bestMin = await recordMin.getBest();
+      final bestMin = await recordMin.getBestEntry();
       expect(bestMin!.value, 3);
     });
 

@@ -72,7 +72,7 @@ class BestRecord extends BaseServiceObject {
     this.fallback,
     super.useCache = false,
   }) : _history = HistoryTracker.json<RecordEntry>(
-          key,
+          "best_record_$key",
           fromJson: (json) => RecordEntry.fromJson(json),
           toJson: (record) => record.toJson(),
           maxLength: historyLength,
@@ -85,7 +85,7 @@ class BestRecord extends BaseServiceObject {
   /// [newValue] is the new value to be considered for recording.
   Future<void> update(num newValue) async {
     await _lock.synchronized(() async {
-      final currentBest = await getBest();
+      final currentBest = await getBestEntry();
       final isBetter = currentBest == null ||
           (mode == RecordMode.max && newValue > currentBest.value) ||
           (mode == RecordMode.min && newValue < currentBest.value);
@@ -98,7 +98,7 @@ class BestRecord extends BaseServiceObject {
   /// Retrieves the best record entry.
   ///
   /// Returns the best [RecordEntry] or null if no records exist.
-  Future<RecordEntry?> getBest() async {
+  Future<RecordEntry?> getBestEntry() async {
     final records = await _history.getAll();
     return records.firstOrNull;
   }
@@ -107,7 +107,7 @@ class BestRecord extends BaseServiceObject {
   ///
   /// Returns the value of the best record or null if no records exist.
   Future<num?> getBestRecord() async {
-    final best = await getBest();
+    final best = await getBestEntry();
     return best?.value;
   }
 
@@ -115,7 +115,7 @@ class BestRecord extends BaseServiceObject {
   ///
   /// Returns the date of the best record or null if no records exist.
   Future<DateTime?> getBestDate() async {
-    final best = await getBest();
+    final best = await getBestEntry();
     return best?.date;
   }
 
@@ -148,7 +148,7 @@ class BestRecord extends BaseServiceObject {
   /// Returns the best [RecordEntry] or the fallback if no best exists.
   /// Throws a [StateError] if neither a best record nor a fallback is available.
   Future<RecordEntry> getBestOrFallback() async {
-    final best = await getBest();
+    final best = await getBestEntry();
     if (best != null) return best;
     if (fallback != null) return fallback!;
     throw StateError('No record found and no fallback provided.');
