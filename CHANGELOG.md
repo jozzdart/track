@@ -2,11 +2,9 @@
 
 ### **New services added**:
 
-- 🏅 **BestRecord** — track the best (max or min) performance or value over time, with a full history and fallback support
-  → Example use cases: high scores, fastest times, highest streaks
+- 🏅 **BestRecord** — track the best (max or min) performance or value over time, with a full history and fallback support. Example use cases: high scores, fastest times, highest streaks
 
-- 🔢 **BasicCounter** — a simple persistent counter with no expiration or alignment
-  → Example use cases: total taps, visits, or actions
+- 🔢 **BasicCounter** — a simple persistent counter with no expiration or alignment. Example use cases: total taps, visits, or actions
 
 ### **Enhancements**:
 
