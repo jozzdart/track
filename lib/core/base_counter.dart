@@ -48,7 +48,9 @@ abstract class BaseCounterService extends BaseTrackerService<int> {
   ///
   /// This method sets the counter value to the fallback value, which is
   /// defined as zero, without altering the last update timestamp.
-  Future<void> clearValueOnly() => value.set(fallbackValue());
+  Future<void> clearValueOnly() => _lock.synchronized(() async {
+        await value.set(fallbackValue());
+      });
 
   /// Retrieves the current raw counter value without checking expiration.
   ///
