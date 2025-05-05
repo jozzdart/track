@@ -128,4 +128,16 @@ class StreakTracker extends BaseTrackerService<int> {
     return remaining.inMilliseconds.clamp(0, total.inMilliseconds) /
         total.inMilliseconds;
   }
+
+  /// Clears the streak state and the best record history.
+  @override
+  Future<void> clear() async {
+    await _lock.synchronized(() async {
+      await Future.wait([
+        value.remove(),
+        lastUpdate.remove(),
+        records.removeKey(), // <- clear the BestRecord keys too
+      ]);
+    });
+  }
 }
