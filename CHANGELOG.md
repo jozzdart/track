@@ -1,3 +1,10 @@
+## 1.1.2
+
+### Patch: Fixed Flutter Web crash for 64-bit encoded types
+
+Bumped `prf` dependency to `^2.4.2` to resolve a Flutter Web runtime crash related to 64-bit integer encoding (`DateTime`, `List<DateTime>`, `List<Duration>`).
+No functional changes in this package.
+
 ## 1.1.1
 
 - Fixed links and problems in the `README`
