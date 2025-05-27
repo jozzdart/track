@@ -1,9 +1,9 @@
 name: track
 description: "Easily track streaks, counters, history, and records. Effortless persistent trackers with no manual timers or storage, just define and go."
 version: 1.1.2
-homepage: https://github.com/jozzzzep/track
-repository: https://github.com/jozzzzep/track
-issue_tracker: https://github.com/jozzzzep/track/issues
+homepage: https://github.com/jozzdart/track
+repository: https://github.com/jozzdart/track
+issue_tracker: https://github.com/jozzdart/track/issues
 topics:
   - streaks
   - counters
@@ -19,8 +19,8 @@ dependencies:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  prf: ^2.4.2
-  synchronized: ">=3.2.0 <4.0.0"
+  prf: ^2.4.5
+  synchronized: ^3.2.0
 
 dev_dependencies:
   flutter_test:

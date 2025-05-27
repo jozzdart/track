@@ -1,7 +1,8 @@
 import 'package:prf/prf.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:equatable/equatable.dart';
-import 'package:track/track.dart';
+
+import '../services/history_tracker.dart';
 
 /// Represents a record entry with a numerical value and a timestamp.
 class RecordEntry extends Equatable {

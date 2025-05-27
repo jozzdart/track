@@ -1,6 +1,9 @@
-import 'package:prf/core/extensions.dart';
+import 'package:prf/prf.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:track/track.dart';
+
+import '../core/base_tracker.dart';
+import '../core/time_period.dart';
+import 'best_record.dart';
 
 /// A persistent streak tracker for managing activity streaks with automatic expiration logic.
 ///
