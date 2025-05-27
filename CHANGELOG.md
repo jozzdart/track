@@ -1,4 +1,4 @@
-## NEXT
+## 1.1.3
 
 - Fixed dependency issues
 - Moved internal files to `lib/src/` to improve encapsulation and API clarity
