@@ -2,8 +2,8 @@
 
 <h3 align="center"><i>From streaks to records — all your progress, automated.</i></h3>
 <p align="center">
-        <img src="https://img.shields.io/codefactor/grade/github/jozzzzep/track?style=flat-square">
-        <img src="https://img.shields.io/github/license/jozzzzep/track?style=flat-square">
+        <img src="https://img.shields.io/codefactor/grade/github/jozzdart/track?style=flat-square">
+        <img src="https://img.shields.io/github/license/jozzdart/track?style=flat-square">
         <img src="https://img.shields.io/pub/points/track?style=flat-square">
         <img src="https://img.shields.io/pub/v/track?style=flat-square">
 </p>
