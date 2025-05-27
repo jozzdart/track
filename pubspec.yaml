@@ -19,8 +19,8 @@ dependencies:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  prf: ^2.4.2
-  synchronized: ">=3.2.0 <4.0.0"
+  prf: ^2.4.5
+  synchronized: ^3.2.0
 
 dev_dependencies:
   flutter_test:
