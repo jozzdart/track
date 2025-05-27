@@ -1,6 +1,8 @@
 import 'package:prf/prf.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:track/track.dart';
+
+import '../core/base_counter.dart';
+import '../core/time_period.dart';
 
 /// A persistent counter that automatically resets at the start of each aligned time period.
 ///

@@ -1,5 +1,6 @@
 import 'package:prf/prf.dart';
-import 'package:track/services/history_tracker.dart';
+
+import '../services/history_tracker.dart';
 
 /// Extensions for building a persisted history tracker from any `PrfAdapter<List<T>>`.
 extension PrfListAdapterExtensions<T> on PrfAdapter<List<T>> {

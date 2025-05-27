@@ -1,6 +1,7 @@
 import 'package:prf/prf.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:track/track.dart';
+
+import '../core/base_counter.dart';
 
 /// A simple persistent counter with no expiration or periodic reset.
 ///
