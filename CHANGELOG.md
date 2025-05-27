@@ -1,3 +1,9 @@
+## NEXT
+
+- Fixed dependency issues
+- Moved internal files to `lib/src/` to improve encapsulation and API clarity
+- Updated README
+
 ## 1.1.2
 
 ### Patch: Fixed Flutter Web crash for 64-bit encoded types
