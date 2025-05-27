@@ -1,4 +1,4 @@
-import 'package:prf/core/extensions.dart';
+import 'package:prf/prf.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:track/track.dart';
 
