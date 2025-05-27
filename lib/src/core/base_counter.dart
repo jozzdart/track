@@ -1,6 +1,7 @@
 import 'package:prf/prf.dart' as prf_package;
 import 'package:synchronized/synchronized.dart';
-import 'package:track/track.dart';
+
+import 'base_tracker.dart';
 
 /// An abstract class for tracking integer counters with expiration logic.
 ///

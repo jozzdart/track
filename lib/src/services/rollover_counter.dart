@@ -1,6 +1,7 @@
 import 'package:prf/prf.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:track/track.dart';
+
+import '../core/base_counter.dart';
 
 /// `RolloverCounter` is a persistent counter designed to automatically reset
 /// after a specified duration from the last update. This is particularly useful
